@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinOps Sentinel | AI-powered cloud cost optimization</title>
+<meta name="description" content="FinOps Sentinel is a browser-based demonstration of cloud cost optimization, resource waste detection, and safer remediation workflows across AWS, Azure, and Google Cloud.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #050505;
+  --panel: rgba(18,16,14,.74);
+  --panel2: rgba(28,24,20,.85);
+  --line: rgba(255,176,46,.2);
+  --line2: rgba(255,255,255,.1);
+  --amber: #ffb02e;
+  --ember: #ff6a2b;
+  --rose: #e23d6b;
+  --text: #f3efe8;
+  --mute: #a59f93;
+  --ok: #5fd39a;
+  --bad: #ff6b6b;
+  --info: #38bdf8;
+  --head: 'Sora','Segoe UI',system-ui,sans-serif;
+  --body: 'Manrope','Segoe UI',system-ui,sans-serif;
+  --mono: 'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --grad: linear-gradient(100deg,#ffb02e,#ff6a2b 60%,#e23d6b);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 400 17px/1.65 var(--body);
+  overflow-x: hidden;
+}
+
+#bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+h1,h2,h3,h4 {
+  font-family: var(--head);
+  line-height: 1.12;
+  letter-spacing: -.02em;
+}
+
+h2 {
+  font-size: clamp(1.9rem,4vw,2.9rem);
+  margin-bottom: .6rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 .78rem var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 14px;
+}
+
+.eyebrow:before {
+  content: "";
+  width: 26px;
+  height: 2px;
+  background: var(--grad);
+}
+
+.lead {
+  color: var(--mute);
+  max-width: 64ch;
+  margin-bottom: 2.4rem;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section {
+  padding: 88px 0;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.grad {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Progress bar and header */
+#prog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--grad);
+  width: 0;
+  z-index: 60;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(5,5,5,.72);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line2);
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  height: 66px;
+}
+
+.brand {
+  font: 800 1.15rem var(--head);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.brand svg {
+  width: 28px;
+  height: 28px;
+}
+
+nav ul {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin-left: auto;
+  font-size: .9rem;
+  font-weight: 500;
+}
+
+nav ul a {
+  text-decoration: none;
+  color: var(--mute);
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+
+nav ul a:hover,
+nav ul a.act {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.btn {
+  font: 700 .92rem var(--body);
+  border: 0;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 11px 20px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform .15s,box-shadow .2s,background .2s;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-a {
+  background: var(--grad);
+  color: #1a0d02;
+  box-shadow: 0 8px 30px -8px rgba(255,106,43,.7);
+}
+
+.btn-a:hover {
+  box-shadow: 0 10px 38px -4px rgba(255,106,43,.9);
+}
+
+.btn-g {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.25);
+}
+
+.btn-g:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.btn-s {
+  padding: 8px 14px;
+  font-size: .84rem;
+}
+
+#authSlot {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#hdrIntro {
+  flex: none;
+}
+
+@media(max-width:1020px) {
+  #hdrIntro {
+    margin-left: auto;
+  }
+
+  #authSlot {
+    margin-left: 0 !important;
+  }
+
+  nav ul {
+    display: none;
+  }
+
+  #authSlot {
+    margin-left: auto;
+  }
+}
+
+@media(max-width:520px) {
+  #hdrIntro {
+    padding: 8px 10px;
+    font-size: 0;
+  }
+
+  #hdrIntro svg {
+    margin: 0;
+  }
+}
+
+@media(max-width:460px) {
+  nav {
+    gap: 10px;
+  }
+
+  .brand {
+    font-size: 1rem;
+    gap: 8px;
+  }
+
+  .brand svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  #authSlot {
+    gap: 6px;
+  }
+
+  #authSlot .btn-s,
+  #hdrIntro {
+    padding: 7px 10px;
+    font-size: .8rem;
+  }
+
+  #hdrIntro {
+    font-size: 0;
+  }
+}
+
+@media(max-width:360px) {
+  .brand {
+    font-size: 0;
+    gap: 0;
+  }
+
+  #authSlot .btn-s {
+    padding: 6px 8px;
+  }
+}
+
+.chip {
+  border: 1px solid var(--line);
+  background: rgba(255,176,46,.1);
+  color: var(--amber);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 600;
+  font-size: .86rem;
+}
+
+/* Reveal animation */
+.js .rv {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .7s ease,transform .7s ease;
+}
+
+.js .rv.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero section */
+.hero {
+  padding: 84px 0 40px;
+}
+
+.hero .grid {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.tag {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: rgba(255,176,46,.08);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: .82rem;
+  color: #ffd9a3;
+  margin-bottom: 22px;
+}
+
+.tag i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 10px var(--ok);
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem,5.6vw,4.4rem);
+  font-weight: 800;
+}
+
+.hero h1 em {
+  font-style: normal;
+  display: block;
+}
+
+.hero p {
+  color: #cfc8ba;
+  max-width: 52ch;
+  margin: 22px 0 30px;
+  font-size: 1.1rem;
+}
+
+.cta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.term {
+  background: rgba(8,7,6,.9);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 90px -20px rgba(255,106,43,.5);
+}
+
+.term .bar {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line2);
+  font: 500 .78rem var(--mono);
+  color: var(--mute);
+}
+
+.term .bar i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #3a342c;
+}
+
+.term .bar i:nth-child(1) {
+  background: #e23d6b;
+}
+
+.term .bar i:nth-child(2) {
+  background: #ffb02e;
+}
+
+.term .bar i:nth-child(3) {
+  background: #5fd39a;
+}
+
+.term .bar span {
+  margin-left: 8px;
+}
+
+#tout {
+  font: 13px/1.7 var(--mono);
+  color: #e8dfd0;
+  padding: 16px 18px;
+  min-height: 330px;
+  white-space: pre-wrap;
+}
+
+#tout .c { color: #7d776c; }
+#tout .a { color: var(--amber); }
+#tout .g { color: var(--ok); }
+#tout .r { color: var(--bad); }
+#tout .b { color: var(--info); }
+
+.cur {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background: var(--amber);
+  vertical-align: -2px;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  margin-top: 56px;
+  border: 1px solid var(--line2);
+  border-radius: 16px;
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+}
+
+.stats div {
+  padding: 22px;
+  border-right: 1px solid var(--line2);
+  font-size: .9rem;
+  color: var(--mute);
+}
+
+.stats div:last-child {
+  border: 0;
+}
+
+.stats strong {
+  display: block;
+  font: 800 1.8rem var(--head);
+  color: var(--text);
+}
+
+@media(max-width:900px) {
+  .hero .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stats div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .stats div:nth-child(-n+2) {
+    border-bottom: 1px solid var(--line2);
+  }
+}
+
+/* Problem section */
+.prob {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.leak {
+  background: var(--panel);
+  border: 1px solid var(--line2);
+  border-radius: 16px;
+  padding: 26px;
+}
+
+.leakbar {
+  display: flex;
+  height: 46px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 18px 0 14px;
+}
+
+.leakbar div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 .82rem var(--head);
+  color: #1a0d02;
+}
+
+.lk {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: .9rem;
+  padding: 6px 0;
+  color: #d9d3c7;
+}
+
+.lk i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.pain {
+  display: grid;
+  gap: 12px;
+}
+
+.pain div {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 14px;
+  align-items: start;
+  background: var(--panel);
+  border: 1px solid var(--line2);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.pain b {
+  display: block;
+  font-family: var(--head);
+  margin-bottom: 2px;
+}
+
+.pain span {
+  color: var(--mute);
+  font-size: .93rem;
+}
+
+.ico {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,176,46,.12);
+  color: var(--amber);
+}
+
+.ico svg {
+  width: 22px;
+  height: 22px;
+}
+
+@media(max-width:900px) {
+  .prob {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cards */
+.three {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 20px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line2);
+  border-top: 2px solid var(--amber);
+  border-radius: 14px;
+  padding: 26px;
+  backdrop-filter: blur(8px);
+}
+
+.card ul {
+  list-style: none;
+}
+
+.card li {
+  padding: 6px 0 6px 20px;
+  position: relative;
+  font-size: .96rem;
+  color: #d9d3c7;
+}
+
+.card li:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .95em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ember);
+}
+
+.num {
+  font: 700 .78rem var(--mono);
+  color: var(--amber);
+  display: block;
+  margin-bottom: 8px;
+}
+
+@media(max-width:900px) {
+  .three {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Calculator */
+.calc {
+  margin-top: 28px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: center;
+  background: var(--panel);
+}
+
+.calc label {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 10px;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: var(--amber);
+}
+
+.big {
+  font: 800 3rem var(--head);
+}
+
+.rate {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+@media(max-width:800px) {
+  .calc {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Segmented control */
+.seg {
+  display: inline-flex;
+  background: rgba(255,255,255,.06);
+  border-radius: 10px;
+  padding: 3px;
+  flex-wrap: wrap;
+}
+
+.seg button {
+  border: 0;
+  background: none;
+  color: var(--mute);
+  font: 600 .85rem var(--body);
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.seg button.on {
+  background: var(--amber);
+  color: #1a0d02;
+}
+
+/* Live demo */
+.demo-notice {
+  margin: 18px 0;
+  padding: 14px 18px;
+  border: 1px solid rgba(255,176,46,.4);
+  border-radius: 12px;
+  background: rgba(255,176,46,.08);
+  color: #ffd9a3;
+  font-size: .9rem;
+  line-height: 1.6;
+}
+
+.demo-notice strong {
+  color: var(--amber);
+}
+
+.demo {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.dtop {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line2);
+}
+
+.dtop .l {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.drop {
+  border: 1.5px dashed var(--line);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: .88rem;
+  color: var(--mute);
+  cursor: pointer;
+  transition: border-color .2s,background .2s;
+}
+
+.drop:hover,
+.drop.over {
+  border-color: var(--amber);
+  background: rgba(255,176,46,.06);
+  color: var(--text);
+}
+
+.drop input {
+  display: none;
+}
+
+.pipe {
+  display: grid;
+  grid-template-columns: repeat(6,1fr);
+  border-bottom: 1px solid var(--line2);
+}
+
+.pipe div {
+  padding: 12px 10px;
+  text-align: center;
+  font: 600 .8rem var(--mono);
+  color: #5d584f;
+  border-right: 1px solid var(--line2);
+  position: relative;
+  transition: color .3s,background .3s;
+}
+
+.pipe div:last-child {
+  border-right: 0;
+}
+
+.pipe div.run {
+  color: var(--amber);
+  background: rgba(255,176,46,.08);
+}
+
+.pipe div.done {
+  color: var(--ok);
+}
+
+.pipe div.done:after {
+  content: "✓";
+  margin-left: 6px;
+}
+
+.dgrid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+}
+
+.dgrid>div {
+  padding: 22px 24px;
+  min-width: 0;
+}
+
+.dgrid>div:first-child {
+  border-right: 1px solid var(--line2);
+}
+
+.ksum {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ksum div {
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: rgba(0,0,0,.25);
+}
+
+.ksum span {
+  display: block;
+  font-size: .78rem;
+  color: var(--mute);
+}
+
+.ksum strong {
+  font: 800 1.45rem var(--head);
+}
+</style>
+</head>
+<body><!-- SOLUTION -->
+<section id="solution" style="padding-top:20px"><div class="wrap">
+  <span class="eyebrow">02 &middot; The solution</span>
+  <h2>An autonomous agent for cloud waste</h2>
+  <p class="lead">FinOps Sentinel does more than draw charts. It reads the bill, decides what is waste, explains why, and writes the command to fix it, with safety checks built in.</p>
+  <div class="three">
+    <div class="card rv"><span class="num">What it does</span><h3>Upload a bill, get a fix list</h3><ul>
+      <li>Upload raw, anonymized billing logs (CSV) and utilization metrics</li>
+      <li>Works across AWS, Azure and Google Cloud</li>
+      <li>Finds orphaned, idle and over-provisioned resources</li>
+      <li>Outputs a plain-language report plus ready-to-run scripts</li></ul></div>
+    <div class="card rv"><span class="num">How it helps</span><h3>Shows exactly where money leaks</h3><ul>
+      <li>Targets the ~30% of budget lost to unused resources</li>
+      <li>Replaces hours of manual spreadsheet reading</li>
+      <li>Ranks every leak by monthly cost</li>
+      <li>Example: 4 unattached EBS volumes costing $1,200/month</li></ul></div>
+    <div class="card rv"><span class="num">What's new</span><h3>From insight to safe action</h3><ul>
+      <li>An agent that acts, not a static chart</li>
+      <li>Generates precise CLI scripts to archive, delete or downsize</li>
+      <li>Protects production before any change is made</li>
+      <li>One tool for multi-cloud waste hunting</li></ul></div>
+  </div>
+</div></section>
+
+<!-- LIVE DEMO -->
+<section id="demo"><div class="wrap">
+  <span class="eyebrow">03 &middot; Live demo</span>
+  <h2>Run the agent on a sample bill</h2>
+  <p class="lead">This is the full pipeline running in your browser. Load the sample multi-cloud bill, or upload your own CSV in the same format. Click any finding to see its explanation and the script the agent writes for it.</p>
+  <div class="demo rv">
+    <div class="dtop">
+      <div class="l">
+        <button class="btn btn-a" id="runSample">&#9654; Run on sample bill</button>
+        <label class="drop" id="drop">Or drop / choose your CSV<input type="file" id="file" accept=".csv,text/csv"></label>
+      </div>
+      <div class="l">
+        <button class="btn btn-g btn-s" id="getSample">Download sample CSV</button>
+      </div>
+    </div>
+    <div class="pipe" id="pipe"><div>Upload</div><div>Clean</div><div>Detect</div><div>AI Agent</div><div>Scripts</div><div>Review</div></div>
+    <div class="dgrid">
+      <div>
+        <div class="ksum">
+          <div><span>Resources scanned</span><strong id="kScan">0</strong></div>
+          <div><span>Findings</span><strong id="kFind">0</strong></div>
+          <div><span>Monthly savings</span><strong class="grad" id="kSave">$0</strong></div>
+        </div>
+        <div class="tbl" id="findings"><p class="empty">Press <b>Run on sample bill</b> to start the scan.</p></div>
+      </div>
+      <div>
+        <div id="explain"><p class="empty">The agent's explanation and fix script will appear here.</p></div>
+      </div>
+    </div>
+  </div>
+  <p class="fine">CSV columns: <code style="font-family:var(--mono);color:#ffd9a3">provider, resource_id, type, scope, monthly_cost, cpu_avg, mem_avg, attached, age_days, env</code>. Your file never leaves the browser. In the full product the explanation is written by the LLM API; this demo uses templates so it works offline.</p>
+</div></section>
+
+<!-- APPROACH -->
+<section id="approach"><div class="wrap">
+  <span class="eyebrow">04 &middot; Technical approach</span>
+  <h2>From upload to savings in six steps</h2>
+  <p class="lead">Click a step to see what goes in, what comes out, and which part of the stack does the work.</p>
+  <div class="arch" id="arch"></div>
+  <div class="detail rv" id="archD"></div>
+  <div class="tech">
+    <div><b>Python</b>Core logic</div><div><b>Pandas</b>CSV processing</div><div><b>ML / Rules</b>Waste detection</div>
+    <div><b>LLM API</b>AI agent and narrative</div><div><b>Streamlit</b>Web interface</div><div><b>Cloud CLIs</b>Script output</div>
+  </div>
+
+  <h3 style="margin:56px 0 8px">One schema for three clouds</h3>
+  <p class="lead" style="margin-bottom:20px">Each provider gets its own parser. Every bill is mapped into the same columns, so the detection rules are written once and work everywhere.</p>
+  <div class="schema rv cmpw"><table>
+    <thead><tr><th>AWS (Cost &amp; Usage Report)</th><th>Azure (Cost export)</th><th>Google Cloud (Billing export)</th><th>Sentinel schema</th></tr></thead>
+    <tbody>
+      <tr><td>line_item_resource_id</td><td>ResourceId</td><td>resource.name</td><td>resource_id</td></tr>
+      <tr><td>product_product_family</td><td>MeterCategory</td><td>service.description</td><td>type</td></tr>
+      <tr><td>product_region</td><td>ResourceLocation</td><td>location.region</td><td>scope</td></tr>
+      <tr><td>line_item_unblended_cost</td><td>CostInBillingCurrency</td><td>cost</td><td>monthly_cost</td></tr>
+      <tr><td>resource_tags_user_env</td><td>Tags["env"]</td><td>labels.env</td><td>env</td></tr>
+    </tbody></table></div>
+
+  <h3 style="margin:56px 0 8px">Detection rules</h3>
+  <p class="lead" style="margin-bottom:20px">Clear rules catch the obvious waste first. An ML layer is planned for unusual spending patterns that rules miss.</p>
+  <div class="rules">
+    <div class="rule rv"><b>Orphaned disk</b><code>attached == false</code><span>Volume or disk not connected to any machine.</span></div>
+    <div class="rule rv"><b>Idle VM</b><code>cpu_avg &lt; 5%</code><span>Machine running for 30 days with almost no work.</span></div>
+    <div class="rule rv"><b>Oversized DB</b><code>cpu &lt; 20% and mem &lt; 30%</code><span>Database paid for at a size it never uses.</span></div>
+    <div class="rule rv"><b>Stale snapshot</b><code>age_days &gt; 90</code><span>Old backups kept long after they matter.</span></div>
+    <div class="rule rv"><b>Unused IP</b><code>type == ip and !attached</code><span>Reserved public address with nothing behind it.</span></div>
+  </div>
+</div></section>
+
+<!-- SAFETY -->
+<section id="safety"><div class="wrap">
+  <span class="eyebrow">05 &middot; Safety and feasibility</span>
+  <h2>Five layers between the AI and your production</h2>
+  <p class="lead">The biggest risk of an agent that writes delete commands is deleting the wrong thing. Every script passes through these layers before it can run.</p>
+  <div class="guard">
+    <div class="layers">
+      <div class="layer rv"><em>1</em><p><b>Production tags are protected</b><span>Anything tagged env=prod is flagged for review only. No script is written.</span></p></div>
+      <div class="layer rv"><em>2</em><p><b>Rule checks validate the AI</b><span>Every command is checked against the uploaded resource list and an allowed-command list.</span></p></div>
+      <div class="layer rv"><em>3</em><p><b>Snapshot before delete</b><span>Disks and databases are backed up first, so every change can be rolled back.</span></p></div>
+      <div class="layer rv"><em>4</em><p><b>Dry-run by default</b><span>Scripts only print what they would do until an engineer turns dry-run off.</span></p></div>
+      <div class="layer rv"><em>&#10003;</em><p><b>A human approves</b><span>Nothing runs until a person on the team reviews and approves it.</span></p></div>
+    </div>
+    <div class="risk rv">
+      <div class="r hd">Risk</div><div></div><div class="s hd">Our answer</div>
+      <div class="r">Deleting the wrong resource could break production</div><div class="a">&rarr;</div><div class="s">Archive or snapshot first, dry-run mode, human approval</div>
+      <div class="r">Billing formats differ across AWS, Azure and GCP</div><div class="a">&rarr;</div><div class="s">Common data schema with one parser per provider</div>
+      <div class="r">AI may suggest an inaccurate command</div><div class="a">&rarr;</div><div class="s">Validate scripts with rule checks before showing them</div>
+      <div class="r">Privacy of company billing data</div><div class="a">&rarr;</div><div class="s">Use anonymized logs; no credentials stored</div>
+    </div>
+  </div>
+  <div class="feas" style="margin:44px 0 0">
+    <div class="rv"><b>Technically feasible</b><span>Standard billing CSV exports and open-source tools</span></div>
+    <div class="rv"><b>Low prototype cost</b><span>Free tiers and sample datasets</span></div>
+    <div class="rv"><b>Quick demo</b><span>Upload a file, get a report and scripts</span></div>
+    <div class="rv"><b>Clear value</b><span>Savings are measured directly in money</span></div>
+  </div>
+</div></section><!-- RESULTS -->
+<section id="results"><div class="wrap">
+  <span class="eyebrow">06 &middot; Results</span>
+  <h2>What a deployment could look like</h2>
+  <p class="lead">Pick a company, then change what the chart shows and how it is drawn. Every view can be downloaded.</p>
+  <div class="dash rv">
+    <div class="cos" id="cos"></div>
+    <div class="dbody">
+      <div class="dleft">
+        <div class="ctrls">
+          <div class="seg" id="dsSeg" role="group" aria-label="Data shown"></div>
+          <div class="seg" id="tySeg" role="group" aria-label="Chart format"></div>
+        </div>
+        <div id="chart" aria-live="polite"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="dright">
+        <span class="badge">Illustrative sample data</span>
+        <h3 id="coName"></h3>
+        <p class="story" id="story"></p>
+        <div class="kpi"><span>Monthly spend saved (month 6)</span><strong class="g" id="k1"></strong></div>
+        <div class="kpi"><span>Cut versus projected bill</span><strong id="k2"></strong></div>
+        <div class="kpi"><span>Six-month savings</span><strong id="k3"></strong></div>
+        <div class="dl" style="margin-top:18px">
+          <button class="btn btn-g btn-s" id="dCsv">Download CSV</button>
+          <button class="btn btn-g btn-s" id="dPng">Download image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="fine">The companies and figures above are fictional examples built to show what a FinOps Sentinel report looks like. They are not real customers.</p>
+
+  <h3 style="margin:56px 0 18px">How it compares</h3>
+  <div class="cmp cmpw rv"><table>
+    <thead><tr><th></th><th>Native cost consoles</th><th>BI dashboards</th><th class="us">FinOps Sentinel</th></tr></thead>
+    <tbody>
+      <tr><td>All three clouds in one view</td><td class="no">One cloud each</td><td class="p">With custom work</td><td class="us y">Yes</td></tr>
+      <tr><td>Finds idle and orphaned resources</td><td class="p">Some, per cloud</td><td class="no">No</td><td class="us y">Yes</td></tr>
+      <tr><td>Explains the leak in plain language</td><td class="no">No</td><td class="no">No</td><td class="us y">Yes, AI narrative</td></tr>
+      <tr><td>Writes the fix script</td><td class="no">No</td><td class="no">No</td><td class="us y">Yes, for all CLIs</td></tr>
+      <tr><td>Snapshot, dry-run and approval built in</td><td class="no">Manual</td><td class="no">N/A</td><td class="us y">Yes</td></tr>
+      <tr><td>Works without cloud credentials</td><td class="no">Needs account access</td><td class="p">Needs data pipeline</td><td class="us y">Yes, CSV upload</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<!-- BUSINESS -->
+<section id="business"><div class="wrap">
+  <span class="eyebrow">07 &middot; Business canvas</span>
+  <h2>Who it is for and how it earns</h2>
+  <p class="lead">The value is easy to prove: every finding has a dollar figure attached.</p>
+  <div class="two">
+    <div class="card rv"><h3>Mission and vision</h3><ul>
+      <li>Mission: help every organization stop wasting cloud money with explainable AI</li>
+      <li>Vision: cloud spending that optimizes itself, safely</li>
+    </ul></div>
+    <div class="card rv"><h3>Market and competition</h3><ul>
+      <li>Target: enterprises, start-ups and IT service providers on AWS, Azure, GCP</li>
+      <li>Alternatives: native cost tools and dashboards that show charts only</li>
+      <li>Our edge: actionable scripts and narrative, multi-cloud</li>
+    </ul></div>
+    <div class="card rv"><h3>Business perspective</h3><ul>
+      <li>Users: FinOps, DevOps and finance teams</li>
+      <li>Model: subscription tiers or a share of savings</li>
+      <li>Value: findings turn directly into money saved</li>
+    </ul></div>
+    <div class="card rv"><h3>Financial planning and requirements</h3><ul>
+      <li>Needs: LLM API credits, cloud hosting, a small dev team</li>
+      <li>Prototype: built on free tiers and open-source tools</li>
+      <li>Revenue: SaaS plans for teams and organizations</li>
+    </ul></div>
+  </div>
+
+  <h3 style="margin:56px 0 24px">Roadmap</h3>
+  <div class="road">
+    <div class="ph now rv"><small>Now</small><b>Hackathon prototype</b><ul><li>CSV upload and cleaning</li><li>Rule-based detection</li><li>Script generation with dry-run</li></ul></div>
+    <div class="ph rv"><small>Next</small><b>MVP</b><ul><li>LLM agent narrative</li><li>Parsers for all three clouds</li><li>Approval workflow</li></ul></div>
+    <div class="ph rv"><small>Then</small><b>Pilot</b><ul><li>Read-only API connectors</li><li>Savings tracker</li><li>ML anomaly detection</li></ul></div>
+    <div class="ph rv"><small>Later</small><b>Scale</b><ul><li>Team workspaces and roles</li><li>Audit log</li><li>Savings-share billing</li></ul></div>
+  </div>
+</div></section>
+
+<!-- IMPACT -->
+<section id="impact"><div class="wrap">
+  <span class="eyebrow">08 &middot; Impact</span>
+  <h2>Impact and benefits</h2>
+  <p class="lead">Savings you can measure, and a lighter footprint on the data centre.</p>
+  <div class="two">
+    <div class="card rv"><h3>Impact on the target audience</h3><ul>
+      <li>Cloud bills drop by removing unused resources</li>
+      <li>Hours of manual billing analysis saved</li>
+      <li>Engineers get safe, ready-made fix scripts</li>
+      <li>Leaders see savings in plain language</li>
+      <li>Example: $14,000 saved in a month from three lines of code</li>
+    </ul></div>
+    <div class="stack">
+      <div class="card rv"><h3>Economic</h3><ul><li>Cuts up to ~30% wasted cloud spend</li><li>Faster, cheaper cost audits</li><li>Clear return on investment</li></ul></div>
+      <div class="card rv"><h3>Social</h3><ul><li>Frees engineers for real work</li><li>Makes cost control easy for non-experts</li><li>Helps small teams afford the cloud</li></ul></div>
+      <div class="card rv"><h3>Environmental</h3><ul><li>Fewer idle servers running</li><li>Lower energy use and carbon footprint</li><li>Efficient use of data-centre resources</li></ul></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="membership" style="padding:10px 0 60px"><div class="wrap">
+  <div class="mem rv">
+    <div><h3>Membership</h3><p>Start free. Move up to a paid plan when your team needs more clouds and approvals.</p></div>
+    <div class="cta">
+      <button class="btn btn-g" id="togPlans" aria-expanded="false">Compare plans</button>
+      <a class="btn btn-a" href="auth.html?mode=signup">Sign up</a>
+    </div>
+  </div>
+  <div id="plans">
+    <div class="pl"><b>Starter</b><b>$0</b><span>1 cloud account, 5 uploads a month, dry-run scripts</span><a class="btn btn-g btn-s" href="auth.html?mode=signup&amp;plan=Starter">Join</a></div>
+    <div class="pl"><b>Team</b><b>$49/mo</b><span>All three clouds, unlimited uploads, savings tracker, approvals</span><a class="btn btn-g btn-s" href="auth.html?mode=signup&amp;plan=Team">Join</a></div>
+    <div class="pl"><b>Enterprise</b><b>$199/mo</b><span>Workspaces and roles, audit log, savings-share billing option</span><a class="btn btn-g btn-s" href="auth.html?mode=signup&amp;plan=Enterprise">Join</a></div>
+  </div>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">
+  <span>FinOps Sentinel | Team Code Catalyst | DEX26020 | Software</span>
+  
+</div></footer><script>
+document.documentElement.classList.add('js');
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+
+function toast(t){
+  const e=document.createElement('div');
+  e.className='toast';
+  e.textContent=t;
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),3200);
+}
+
+function save(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ---------- background ---------- */
+(function(){
+  const c=$('#bg'),x=c.getContext('2d');
+  let W,H,P=[],mx=-999,my=-999;
+
+  function size(){
+    W=c.width=innerWidth;
+    H=c.height=innerHeight;
+    const n=Math.min(100,Math.floor(W*H/16000));
+    P=[];
+    for(let i=0;i<n;i++)
+      P.push({
+        x:Math.random()*W,
+        y:Math.random()*H,
+        vx:(Math.random()-.5)*.35,
+        vy:(Math.random()-.5)*.35,
+        r:Math.random()*1.8+.8,
+        h:Math.random()<.25
+      });
+  }
+
+  addEventListener('resize',()=>{
+    size();
+    if(still)frame();
+  });
+
+  addEventListener('mousemove',e=>{
+    mx=e.clientX;
+    my=e.clientY;
+  });
+
+  function frame(){
+    x.fillStyle='#050505';
+    x.fillRect(0,0,W,H);
+
+    const g=x.createRadialGradient(W*.8,H*.15,0,W*.8,H*.15,W*.6);
+    g.addColorStop(0,'rgba(255,106,43,.15)');
+    g.addColorStop(1,'rgba(255,106,43,0)');
+    x.fillStyle=g;
+    x.fillRect(0,0,W,H);
+
+    for(const p of P){
+      if(!still){
+        p.x+=p.vx;
+        p.y+=p.vy;
+        if(p.x<0||p.x>W)p.vx*=-1;
+        if(p.y<0||p.y>H)p.vy*=-1;
+      }
+
+      const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);
+      if(d<120&&d>0&&!still){
+        p.x+=dx/d*1.2;
+        p.y+=dy/d*1.2;
+      }
+    }
+
+    for(let i=0;i<P.length;i++){
+      const a=P[i];
+
+      for(let j=i+1;j<P.length;j++){
+        const b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+        if(d<150){
+          x.strokeStyle='rgba(255,176,46,'+(.2*(1-d/150))+')';
+          x.lineWidth=1;
+          x.beginPath();
+          x.moveTo(a.x,a.y);
+          x.lineTo(b.x,b.y);
+          x.stroke();
+        }
+      }
+
+      const dm=Math.hypot(a.x-mx,a.y-my);
+      if(dm<170){
+        x.strokeStyle='rgba(255,106,43,'+(.5*(1-dm/170))+')';
+        x.beginPath();
+        x.moveTo(a.x,a.y);
+        x.lineTo(mx,my);
+        x.stroke();
+      }
+
+      x.fillStyle=a.h?'#ff6a2b':'#ffb02e';
+      x.globalAlpha=a.h?.95:.65;
+      x.beginPath();
+      x.arc(a.x,a.y,a.r,0,7);
+      x.fill();
+      x.globalAlpha=1;
+    }
+
+    if(!still)requestAnimationFrame(frame);
+  }
+
+  size();
+  frame();
+})();
+
+/* ---------- scroll progress, nav highlight, reveal ---------- */
+addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  $('#prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+},{passive:true});
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.classList.add('in');
+    io.unobserve(e.target);
+  }
+}),{threshold:.12});
+
+$$('.rv').forEach(el=>io.observe(el));
+
+const so=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    $$('#navl a').forEach(a=>
+      a.classList.toggle('act',a.getAttribute('href')==='#'+e.target.id)
+    );
+  }
+}),{rootMargin:'-45% 0px -50% 0px'});
+
+$$('main section[id]').forEach(s=>so.observe(s));
+
+/* ---------- hero terminal ---------- */
+(function(){
+  const L=[
+    ['c','# 1. upload and clean'],
+    ['','Parsing 3 providers ... '],
+    ['g','  1,284 line items -> common schema'],
+    ['c','# 2. detect waste'],
+    ['a','  ! 4 unattached EBS volumes        $1,200/mo'],
+    ['a','  ! Azure VM idle at 2% CPU (30d)    $640/mo'],
+    ['a','  ! GCP Cloud SQL oversized          $410/mo'],
+    ['r','  x prod-api-db  env=prod  -> review only'],
+    ['c','# 3. agent explains'],
+    ['b','  "These volumes have had no machine attached for 47 days."'],
+    ['c','# 4. safe script (dry-run on)'],
+    ['','  aws ec2 create-snapshot --volume-id vol-0a1b2c'],
+    ['','  aws ec2 delete-volume --volume-id vol-0a1b2c --dry-run'],
+    ['g','  Potential savings: $2,250 / month. Awaiting approval.']
+  ];
+
+  const o=$('#tout');
+
+  if(still){
+    o.innerHTML=L.map(([c,t])=>`<span class="${c}">${esc(t)}</span>`).join('\n');
+    return;
+  }
+
+  let i=0,j=0,html='';
+
+  function tick(){
+    if(i>=L.length){
+      o.innerHTML=html+'<span class="cur"></span>';
+      setTimeout(()=>{
+        i=0;
+        j=0;
+        html='';
+        tick();
+      },5000);
+      return;
+    }
+
+    const [c,t]=L[i];
+    j+=3;
+    const part=`<span class="${c}">${esc(t.slice(0,j))}</span>`;
+    o.innerHTML=html+part+'<span class="cur"></span>';
+
+    if(j>=t.length){
+      html+=`<span class="${c}">${esc(t)}</span>\n`;
+      i++;
+      j=0;
+      setTimeout(tick,180);
+    }else{
+      setTimeout(tick,16);
+    }
+  }
+
+  tick();
+})();
+
+/* ---------- estimator ---------- */
+let rate=.3;
+
+function calc(){
+  const v=+$('#spend').value;
+  $('#spendVal').textContent=money(v);
+  $('#save').textContent=money(v*rate);
+  $('#saveYear').textContent=money(v*rate*12)+' a year';
+}
+
+$('#spend').addEventListener('input',calc);
+
+$('#rateSeg').onclick=e=>{
+  const b=e.target.closest('button');
+  if(!b)return;
+  rate=+b.dataset.r;
+  $$('#rateSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  calc();
+};
+
+/* ---------- LIVE DEMO: rule engine + script generator ---------- */
+const SAMPLE=`provider,resource_id,type,scope,monthly_cost,cpu_avg,mem_avg,attached,age_days,env
+AWS,vol-0a1b2c,volume,us-east-1,300,,,false,47,dev
+AWS,vol-0d4e5f,volume,us-east-1,300,,,false,61,dev
+AWS,vol-07g8h9,volume,us-east-1,300,,,false,47,test
+AWS,vol-0j1k2l,volume,us-east-1,300,,,false,52,dev
+AWS,i-09build01,vm,us-east-1,520,3,12,true,210,ci
+AWS,i-0web0001,vm,us-east-1,480,61,70,true,400,prod
+AWS,snap-0old991,snapshot,us-east-1,95,,,true,240,dev
+AWS,eipalloc-0f12ab,ip,us-east-1,4,,,false,90,dev
+AWS,prod-api-db,database,us-east-1,1150,9,18,true,380,prod
+Azure,vm-test-02,vm,rg-staging,640,2,10,true,95,staging
+Azure,disk-old-data,volume,rg-staging,180,,,false,130,staging
+Azure,sqldb-reports,database,rg-analytics,720,11,22,true,300,dev
+GCP,analytics-sql-1,database,us-central1-a,820,8,19,true,150,dev
+GCP,render-node-7,vm,us-central1-a,560,1,6,true,60,dev
+GCP,disk-scratch-3,volume,us-central1-a,120,,,false,75,dev
+GCP,frontend-vm,vm,us-central1-a,350,48,55,true,500,prod`;function parseCSV(t){
+  const lines=t.trim().split(/\r?\n/).filter(Boolean);if(lines.length<2)throw new Error('The file needs a header row and at least one resource.');
+  const h=lines[0].split(',').map(s=>s.trim().toLowerCase());
+  const need=['provider','resource_id','type','monthly_cost'];const miss=need.filter(n=>!h.includes(n));
+  if(miss.length)throw new Error('Missing column(s): '+miss.join(', '));
+  return lines.slice(1).map(l=>{const v=l.split(',');const o={};h.forEach((k,i)=>o[k]=(v[i]||'').trim());
+    const p=o.provider.toLowerCase();o.provider=p.startsWith('az')?'Azure':p.startsWith('g')?'GCP':'AWS';
+    o.monthly_cost=+o.monthly_cost||0;o.cpu=o.cpu_avg===''||o.cpu_avg==null?null:+o.cpu_avg;o.mem=o.mem_avg===''||o.mem_avg==null?null:+o.mem_avg;
+    o.att=String(o.attached).toLowerCase()!=='false';o.age=+o.age_days||0;o.env=(o.env||'').toLowerCase();o.type=(o.type||'').toLowerCase();o.scope=o.scope||'default';return o});
+}
+const KIND={
+  orphan:{n:'Orphaned disk',save:1,act:'Snapshot, then delete'},
+  idle:{n:'Idle VM',save:.9,act:'Stop or deallocate'},
+  big:{n:'Oversized DB',save:.5,act:'Downsize one tier'},
+  snap:{n:'Stale snapshot',save:1,act:'Delete'},
+  ip:{n:'Unused IP',save:1,act:'Release'}
+};
+function detect(rows){
+  const f=[];
+  rows.forEach(r=>{
+    let k=null,conf=0,why='';
+    if(r.type==='volume'&&!r.att){k='orphan';conf=.97;why=`has had no machine attached for ${r.age} days`}
+    else if(r.type==='ip'&&!r.att){k='ip';conf=.95;why='is reserved but not connected to anything'}
+    else if(r.type==='snapshot'&&r.age>90){k='snap';conf=.85;why=`is ${r.age} days old, well past a 90-day retention window`}
+    else if(r.type==='vm'&&r.cpu!=null&&r.cpu<5){k='idle';conf=r.cpu<3?.93:.82;why=`averaged only ${r.cpu}% CPU over the last 30 days`}
+    else if(r.type==='database'&&r.cpu!=null&&r.cpu<20&&r.mem!=null&&r.mem<30){k='big';conf=.78;why=`peaks at ${r.cpu}% CPU and ${r.mem}% memory, so a smaller tier would fit`}
+    if(k)f.push({...r,k,conf,why,saving:Math.round(r.monthly_cost*KIND[k].save),prod:r.env==='prod'});
+  });
+  return f.sort((a,b)=>(a.prod-b.prod)||(b.saving-a.saving));
+}
+function script(x){
+  const id=x.resource_id,sc=x.scope,P=x.provider;let cmds=[];
+  if(P==='AWS'){
+    if(x.k==='orphan')cmds=[`aws ec2 create-snapshot --volume-id ${id} --description "sentinel-backup-${id}"`,`aws ec2 delete-volume --volume-id ${id} --region ${sc}`];
+    if(x.k==='idle')cmds=[`aws ec2 stop-instances --instance-ids ${id} --region ${sc}`];
+    if(x.k==='snap')cmds=[`aws ec2 delete-snapshot --snapshot-id ${id} --region ${sc}`];
+    if(x.k==='ip')cmds=[`aws ec2 release-address --allocation-id ${id} --region ${sc}`];
+    if(x.k==='big')cmds=[`aws rds create-db-snapshot --db-instance-identifier ${id} --db-snapshot-identifier ${id}-sentinel-bak`,`aws rds modify-db-instance --db-instance-identifier ${id} --db-instance-class db.t3.medium`];
+  }else if(P==='Azure'){
+    if(x.k==='orphan')cmds=[`az snapshot create --resource-group ${sc} --name ${id}-bak --source ${id}`,`az disk delete --resource-group ${sc} --name ${id} --yes`];
+    if(x.k==='idle')cmds=[`az vm deallocate --resource-group ${sc} --name ${id}`];
+    if(x.k==='big')cmds=[`az sql db update --resource-group ${sc} --server <server-name> --name ${id} --service-objective S1`];
+    if(x.k==='snap')cmds=[`az snapshot delete --resource-group ${sc} --name ${id}`];
+    if(x.k==='ip')cmds=[`az network public-ip delete --resource-group ${sc} --name ${id}`];
+  }else{
+    if(x.k==='orphan')cmds=[`gcloud compute disks snapshot ${id} --zone ${sc} --snapshot-names ${id}-bak`,`gcloud compute disks delete ${id} --zone ${sc} --quiet`];
+    if(x.k==='idle')cmds=[`gcloud compute instances stop ${id} --zone ${sc}`];
+    if(x.k==='big')cmds=[`gcloud sql backups create --instance ${id}`,`gcloud sql instances patch ${id} --tier db-custom-2-7680`];
+    if(x.k==='snap')cmds=[`gcloud compute snapshots delete ${id} --quiet`];
+    if(x.k==='ip')cmds=[`gcloud compute addresses delete ${id} --region ${sc} --quiet`];
+  }
+  const head=`#!/usr/bin/env bash
+# FinOps Sentinel | ${KIND[x.k].n} | ${P} | ${id}
+# Estimated saving: ${money(x.saving)}/month
+set -euo pipefail
+DRY_RUN=\${DRY_RUN:-1}   # set DRY_RUN=0 only after approval
+run(){ if [ "$DRY_RUN" = 1 ]; then echo "[dry-run] $*"; else "$@"; fi; }
+`;
+  if(x.prod)return head+`\n# BLOCKED: resource is tagged env=prod.\n# Sentinel will not generate commands for production.\n# A human owner must review this finding manually.\n`+cmds.map(c=>'# '+c).join('\n')+'\n';
+  return head+'\n'+cmds.map(c=>'run '+c).join('\n')+'\n';
+}
+function narrative(x){
+  const base=`<b>${esc(x.resource_id)}</b> on ${x.provider} ${esc(x.why)}. It costs <b>${money(x.monthly_cost)}</b> a month.`;
+  const plan={orphan:'I recommend taking a snapshot first so the data can be restored, then deleting the disk.',
+    idle:'I recommend stopping it outside working hours or removing it if no team claims it within a week.',
+    big:'I recommend a backup, then moving it down one size. It can be scaled back up in minutes if needed.',
+    snap:'I recommend deleting it unless a compliance rule requires keeping it longer.',
+    ip:'I recommend releasing the address. Reserved addresses are billed even when unused.'}[x.k];
+  if(x.prod)return base+` However, it is tagged <b>production</b>, so I have not written a fix. Please ask the service owner to confirm before any change.`;
+  return base+' '+plan+` Expected saving: <b>${money(x.saving)}/month</b>.`;
+}
+function hl(s){return esc(s).replace(/^(#.*)$/gm,'<span class="c">$1</span>').replace(/^(run )/gm,'<span class="k">$1</span>').replace(/(&quot;[^&]*&quot;)/g,'<span class="s">$1</span>')}
+
+let FIND=[],ROWS=[],sel=0,busy=false;
+async function runPipeline(text,name){
+  if(busy)return;busy=true;
+  const steps=$$('#pipe div');steps.forEach(s=>s.className='');
+  const wait=ms=>new Promise(r=>setTimeout(r,still?0:ms));
+  try{
+    steps[0].className='run';await wait(350);
+    ROWS=parseCSV(text);steps[0].className='done';
+    steps[1].className='run';await wait(400);steps[1].className='done';
+    steps[2].className='run';await wait(500);FIND=detect(ROWS);steps[2].className='done';
+    $('#kScan').textContent=ROWS.length;$('#kFind').textContent=FIND.length;
+    steps[3].className='run';await wait(450);steps[3].className='done';
+    steps[4].className='run';await wait(400);steps[4].className='done';
+    steps[5].className='run';
+    const tot=FIND.filter(f=>!f.prod).reduce((a,b)=>a+b.saving,0);
+    countUp($('#kSave'),tot);
+    sel=0;drawFindings();drawExplain();
+    toast(`${FIND.length} findings in ${name}. ${money(tot)}/month can be saved.`);
+  }catch(err){steps.forEach(s=>s.className='');$('#findings').innerHTML=`<p class="empty" style="color:var(--bad)">${esc(err.message)}</p>`;$('#explain').innerHTML=''}
+  busy=false;
+}
+function countUp(el,to){if(still){el.textContent=money(to);return}const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/900);el.textContent=money(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0)}
+function drawFindings(){
+  if(!FIND.length){$('#findings').innerHTML='<p class="empty">No waste found in this file. Nice and tidy.</p>';return}
+  $('#findings').innerHTML='<table class="t"><thead><tr><th>Resource</th><th>Finding</th><th>Confidence</th><th class="n">Saving / mo</th></tr></thead><tbody>'+
+    FIND.map((f,i)=>`<tr class="${i===sel?'sel':''}" data-i="${i}" tabindex="0"><td><span class="pv ${f.provider}">${f.provider}</span> ${esc(f.resource_id)}${f.prod?'<span class="prod">PROD</span>':''}</td><td>${KIND[f.k].n}</td><td><span class="conf"><i style="width:${f.conf*100}%"></i></span> ${Math.round(f.conf*100)}%</td><td class="n">${f.prod?'<span style="color:var(--mute)">review</span>':money(f.saving)}</td></tr>`).join('')+'</tbody></table>';
+}
+function drawExplain(){
+  const f=FIND[sel];if(!f){$('#explain').innerHTML='';return}
+  const checks=[
+    [!f.prod,f.prod?'Tagged env=prod: script blocked':'Not tagged production'],
+    [true,'Resource ID found in uploaded bill'],
+    [true,'Only allowed CLI commands used'],
+    [true,f.k==='orphan'||f.k==='big'?'Backup step runs before the change':'No data loss: change is reversible or resource is empty'],
+    [true,'Dry-run is on by default']];
+  $('#explain').innerHTML=`<div class="narr"><span class="who">SENTINEL AGENT</span>${narrative(f)}</div>
+    <div class="code">${hl(script(f))}</div>
+    <ul class="checks">${checks.map(([ok,t])=>`<li class="${ok?'':'w'}">${t}</li>`).join('')}</ul>
+    <div class="dl"><button class="btn btn-g btn-s" id="dlSh">Download this script</button><button class="btn btn-g btn-s" id="dlAll">Download full report</button>${f.prod?'':'<button class="btn btn-a btn-s" id="appr">Approve</button>'}</div>`;
+  $('#dlSh').onclick=()=>save(new Blob([script(f)],{type:'text/x-sh'}),`sentinel_${f.resource_id}.sh`);
+  $('#dlAll').onclick=report;
+  const ap=$('#appr');if(ap)ap.onclick=()=>{ap.textContent='Approved ✓';ap.disabled=true;$$('#pipe div')[5].className='done';toast('Approved. The script still runs in dry-run until DRY_RUN=0.')};
+}
+function report(){
+  const tot=FIND.filter(f=>!f.prod).reduce((a,b)=>a+b.saving,0);
+  let t=`FINOPS SENTINEL REPORT\nResources scanned: ${ROWS.length}\nFindings: ${FIND.length}\nPotential savings: ${money(tot)}/month (${money(tot*12)}/year)\n\n`;
+  FIND.forEach((f,i)=>{t+=`${i+1}. [${f.provider}] ${f.resource_id} - ${KIND[f.k].n}\n   ${narrative(f).replace(/<[^>]+>/g,'')}\n\n`});
+  save(new Blob([t],{type:'text/plain'}),'finops-sentinel-report.txt');
+}$('#findings').addEventListener('click',e=>{
+  const r=e.target.closest('tr[data-i]');
+  if(r){sel=+r.dataset.i;drawFindings();drawExplain()}
+});
+
+$('#findings').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const r=e.target.closest('tr[data-i]');
+    if(r){
+      sel=+r.dataset.i;
+      drawFindings();
+      drawExplain();
+      $(`#findings tr[data-i="${sel}"]`).focus();
+    }
+  }
+});
+
+$('#runSample').onclick=()=>runPipeline(SAMPLE,'the sample bill');
+$('#getSample').onclick=()=>save(new Blob([SAMPLE],{type:'text/csv'}),'sentinel_sample_bill.csv');
+
+function readFile(f){
+  if(!f)return;
+  if(f.size>5e6){toast('Please use a file under 5 MB for the demo.');return}
+  const r=new FileReader();
+  r.onload=()=>runPipeline(r.result,f.name);
+  r.readAsText(f);
+}
+
+$('#file').onchange=e=>readFile(e.target.files[0]);
+
+const dr=$('#drop');
+['dragenter','dragover'].forEach(ev=>dr.addEventListener(ev,e=>{
+  e.preventDefault();
+  dr.classList.add('over');
+}));
+['dragleave','drop'].forEach(ev=>dr.addEventListener(ev,e=>{
+  e.preventDefault();
+  dr.classList.remove('over');
+}));
+dr.addEventListener('drop',e=>readFile(e.dataTransfer.files[0]));
+
+/* ---------- architecture explorer ---------- */
+const ST=[
+ {n:'Upload',s:'Billing CSV + utilization metrics',w:'The user uploads cost exports from one or more clouds, plus CPU and memory averages. No account credentials are needed.',i:['AWS Cost & Usage Report','Azure cost export','GCP billing export','Utilization metrics CSV'],o:['Raw files in a temporary workspace'],c:`files = st.file_uploader(
+  "Billing exports", type="csv",
+  accept_multiple_files=True)`},
+ {n:'Clean',s:'Validate, anonymize, merge clouds',w:'One parser per provider maps columns into the common schema. Account numbers and names are hashed so the data stays anonymous.',i:['Raw provider CSVs'],o:['One table in the Sentinel schema','Hashed account IDs'],c:`df = pd.concat([
+  parse_aws(a), parse_azure(z), parse_gcp(g)])
+df["account"] = df.account.map(sha256)`},
+ {n:'Detect',s:'Find idle, orphaned, oversized',w:'Rules flag clear waste such as unattached disks or VMs below 5% CPU. An ML model is planned for unusual spending spikes.',i:['Clean table'],o:['Findings with type, confidence and saving'],c:`idle = df[(df.type=="vm") &
+          (df.cpu_avg < 5)]
+orphan = df[(df.type=="volume") &
+            (~df.attached)]`},
+ {n:'AI Agent',s:'Explain leaks in plain language',w:'The LLM receives each finding as structured data and writes a short explanation and recommendation that a manager can understand.',i:['Findings (JSON)'],o:['Plain-language explanation per finding','Executive summary'],c:`prompt = f"""Explain this cloud
+waste finding to a manager in two
+sentences: {finding.to_json()}"""`},
+ {n:'Scripts',s:'Generate safe CLI commands',w:'Commands are built from templates for aws, az and gcloud, then validated: the resource must exist in the bill, the command must be on an allow-list, and production is blocked.',i:['Findings','Command templates'],o:['Bash scripts with dry-run guard','Validation report'],c:`assert finding.env != "prod"
+assert cmd.split()[0] in ALLOWED
+script = DRY_RUN_HEADER + cmd`},
+ {n:'Review',s:'Approve, run, track savings',w:'An engineer reviews each script, approves it, and turns dry-run off. Sentinel then tracks the bill over the next months to confirm the savings.',i:['Scripts','Human approval'],o:['Executed changes','Savings tracker'],c:`if approved_by(user):
+    run(script, dry_run=False)
+    tracker.log(finding.saving)`}
+];
+
+let stI=0;
+
+function arch(){
+  $('#arch').innerHTML=ST.map((s,i)=>
+    `<button class="st rv in ${i===stI?'on':''}" data-i="${i}"><small>0${i+1}</small><b>${s.n}</b><span>${s.s}</span></button>`
+  ).join('');
+
+  const s=ST[stI];
+
+  $('#archD').innerHTML=`<div><h4>Step ${stI+1}: ${s.n}</h4><p>${s.w}</p></div>
+  <div><h4>Input</h4><ul>${s.i.map(x=>'<li>&rarr; '+x+'</li>').join('')}</ul>
+  <h4 style="margin-top:14px">Output</h4><ul>${s.o.map(x=>'<li>&larr; '+x+'</li>').join('')}</ul></div>
+  <div><h4>Python sketch</h4><div class="code">${esc(s.c)}</div></div>`;
+}
+
+$('#arch').onclick=e=>{
+  const b=e.target.closest('.st');
+  if(b){stI=+b.dataset.i;arch()}
+};
+arch();
+
+/* ---------- results dashboard ---------- */
+const M=['M1','M2','M3','M4','M5','M6'];
+
+const CO=[
+ {n:'Kavya Logistics',t:'Freight and delivery, AWS',
+  s:'The agent found 4 unattached volumes and a fleet of build servers running all night. Dry-run scripts were approved on a Friday.',
+  before:[118,121,124,127,131,134],after:[118,119,108,97,92,90],
+  waste:{'Idle VMs':19,'Orphaned volumes':11,'Oversized DBs':9,'Stale snapshots':5},mix:{AWS:100}},
+ {n:'Brightleaf Health',t:'Clinic software, Azure and AWS',
+  s:'Test environments kept running after releases. Sentinel flagged them as idle and proposed schedules to stop them at night.',
+  before:[64,66,69,71,72,75],after:[64,63,58,52,49,48],
+  waste:{'Idle VMs':10,'Orphaned volumes':4,'Oversized DBs':8,'Stale snapshots':5},mix:{Azure:62,AWS:38}},
+ {n:'Orbit Fintech',t:'Payments start-up, GCP and AWS',
+  s:'Two analytics clusters were sized for a launch that never came. The report recommended downsizing with a rollback snapshot.',
+  before:[212,219,226,231,240,247],after:[212,214,198,176,168,161],
+  waste:{'Idle VMs':26,'Orphaned volumes':9,'Oversized DBs':38,'Stale snapshots':13},mix:{GCP:55,AWS:45}},
+ {n:'Lumen Studios',t:'Media rendering, all three clouds',
+  s:'Render nodes were left running between projects. Merging three bills into one view showed the overlap nobody could see before.',
+  before:[88,93,97,101,108,112],after:[88,90,84,73,69,66],
+  waste:{'Idle VMs':24,'Orphaned volumes':6,'Oversized DBs':7,'Stale snapshots':9},mix:{AWS:40,Azure:30,GCP:30}}
+];
+
+const COL=['#ffb02e','#ff6a2b','#e23d6b','#8b5cf6','#38bdf8'];
+const st={co:0,ds:'spend',ty:'bar'};
+const TYPES={bar:'Bar',line:'Line',area:'Area',donut:'Donut',table:'Table'};
+const DS={spend:'Monthly spend',waste:'Waste found',mix:'Cloud split'};
+
+function dataset(){
+  const c=CO[st.co];
+  if(st.ds==='spend')return{u:'$K',labels:M,series:[
+    {name:'Without Sentinel',values:c.before,color:'#6f6a60'},
+    {name:'With Sentinel',values:c.after,color:'#ffb02e'}]};
+  if(st.ds==='waste')return{u:'$K/mo',labels:Object.keys(c.waste),series:[
+    {name:'Waste found',values:Object.values(c.waste),color:'#ff6a2b'}]};
+  return{u:'%',labels:Object.keys(c.mix),series:[
+    {name:'Share of bill',values:Object.values(c.mix),color:'#ffb02e'}]};
+}
+
+const nice=m=>{
+  const p=Math.pow(10,Math.floor(Math.log10(m))),f=m/p;
+  return(f<=1?1:f<=2?2:f<=5?5:10)*p;
+};
+
+const T=(x,y,t,a='middle',s=12,f='#a59f93')=>
+  `<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" fill="${f}" font-family="Manrope,Segoe UI,sans-serif">${t}</text>`;
+
+function render(){
+  const d=dataset(),box=$('#chart'),W=720,H=360,m={l:52,r:14,t:16,b:40},ty=st.ty;
+
+  $('#legend').innerHTML=(ty==='donut'
+    ?d.labels.map((l,i)=>`<span><i style="background:${COL[i%5]}"></i>${l}</span>`)
+    :d.series.map(s=>`<span><i style="background:${s.color}"></i>${s.name}</span>`)).join('');
+
+  if(ty==='table'){
+    box.innerHTML='<table class="t"><thead><tr><th></th>'+
+      d.series.map(s=>`<th class="n">${s.name} (${d.u})</th>`).join('')+
+      '</tr></thead><tbody>'+
+      d.labels.map((l,i)=>`<tr><td>${l}</td>`+
+        d.series.map(s=>`<td class="n">${s.values[i]}</td>`).join('')+'</tr>').join('')+
+      '<tr><td><b>Total</b></td>'+
+      d.series.map(s=>`<td class="n"><b>${s.values.reduce((a,b)=>a+b,0)}</b></td>`).join('')+
+      '</tr></tbody></table>';
+    $('#legend').innerHTML='';
+    return;
+  }
+
+  let g='';
+
+  if(ty==='donut'){
+    const v=d.series[0].values,tot=v.reduce((a,b)=>a+b,0),cx=360,cy=175,R=125,r=78;
+    let a0=-Math.PI/2;
+
+    v.forEach((n,i)=>{
+      let a1=a0+n/tot*Math.PI*2;
+      if(a1-a0>=Math.PI*2-1e-6)a1=a0+Math.PI*2-1e-4;
+      const lg=a1-a0>Math.PI?1:0;
+      const p=(R2,ang)=>[cx+R2*Math.cos(ang),cy+R2*Math.sin(ang)];
+      const[x0,y0]=p(R,a0),[x1,y1]=p(R,a1),[x2,y2]=p(r,a1),[x3,y3]=p(r,a0);
+
+      g+=`<path d="M${x0} ${y0}A${R} ${R} 0 ${lg} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${lg} 0 ${x3} ${y3}Z" fill="${COL[i%5]}" stroke="#050505" stroke-width="3"><title>${d.labels[i]}: ${n} ${d.u} (${Math.round(n/tot*100)}%)</title></path>`;
+      const mid=(a0+a1)/2,[lx,ly]=p(R+26,mid);
+      g+=T(lx,ly+4,Math.round(n/tot*100)+'%','middle',12,'#f3efe8');
+      a0=a1;
+    });
+
+    g+=T(cx,cy-2,st.ds==='mix'?'100%':tot,'middle',30,'#f3efe8')+
+      T(cx,cy+20,d.u+(st.ds==='spend'?' (without)':''),'middle',12);
+    box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Donut chart">${g}</svg>`;
+    return;
+  }
+
+  const all=d.series.flatMap(s=>s.values),mx=nice(Math.max(...all)*1.05),iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const Y=v=>m.t+ih-v/mx*ih,n=d.labels.length;
+
+  for(let i=0;i<=5;i++){
+    const v=mx/5*i,y=Y(v);
+    g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.08)"/>`+
+      T(m.l-8,y+4,Math.round(v),'end',11);
+  }
+
+  const gw=iw/n;
+  d.labels.forEach((l,i)=>g+=T(m.l+gw*i+gw/2,H-14,l,'middle',12));
+
+  if(ty==='bar'){
+    const k=d.series.length,bw=Math.min(46,gw*.7/k);
+    d.series.forEach((s,si)=>s.values.forEach((v,i)=>{
+      const x=m.l+gw*i+gw/2-(k*bw)/2+si*bw,y=Y(v);
+      g+=`<rect class="bar" x="${x+2}" y="${y}" width="${bw-4}" height="${m.t+ih-y}" rx="4" fill="${s.color}"><title>${d.labels[i]} | ${s.name}: ${v} ${d.u}</title></rect>`;
+      if(k===1)g+=T(x+bw/2,y-7,v,'middle',12,'#f3efe8');
+    }));
+  }else{
+    d.series.forEach(s=>{
+      const pts=s.values.map((v,i)=>[m.l+gw*i+gw/2,Y(v)]);
+      const line=pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join('');
+      if(ty==='area')g+=`<path d="${line}L${pts[n-1][0]} ${m.t+ih}L${pts[0][0]} ${m.t+ih}Z" fill="${s.color}" opacity=".22"/>`;
+      g+=`<path class="draw" d="${line}" fill="none" stroke="${s.color}" stroke-width="3" stroke-linejoin="round"/>`;
+      pts.forEach((p,i)=>g+=`<circle cx="${p[0]}" cy="${p[1]}" r="4.5" fill="${s.color}" stroke="#050505" stroke-width="2"><title>${d.labels[i]} | ${s.name}: ${s.values[i]} ${d.u}</title></circle>`);
+    });
+  }
+
+  g+=T(m.l,10,d.u,'start',11);
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${TYPES[ty]} chart">${g}</svg>`;
+}
+
+function controls(){
+  $('#cos').innerHTML=CO.map((c,i)=>`<button class="co ${i===st.co?'on':''}" data-i="${i}"><b>${c.n}</b><span>${c.t}</span></button>`).join('');
+  $('#dsSeg').innerHTML=Object.entries(DS).map(([k,v])=>`<button class="${k===st.ds?'on':''}" data-ds="${k}">${v}</button>`).join('');
+  $('#tySeg').innerHTML=Object.entries(TYPES).map(([k,v])=>`<button class="${k===st.ty?'on':''}" data-ty="${k}">${v}</button>`).join('');
+
+  const c=CO[st.co],sv=c.before[5]-c.after[5],tot=c.before.reduce((a,b)=>a+b,0)-c.after.reduce((a,b)=>a+b,0);
+  $('#coName').textContent=c.n;
+  $('#story').textContent=c.s;
+  $('#k1').textContent='$'+sv+'K';
+  $('#k2').textContent=Math.round(sv/c.before[5]*100)+'%';
+  $('#k3').textContent='$'+tot+'K';
+}
+
+function refresh(){controls();render()}
+$('#cos').onclick=e=>{const b=e.target.closest('.co');if(b){st.co=+b.dataset.i;refresh()}};
+$('#dsSeg').onclick=e=>{const b=e.target.closest('button');if(b){st.ds=b.dataset.ds;refresh()}};
+$('#tySeg').onclick=e=>{const b=e.target.closest('button');if(b){st.ty=b.dataset.ty;refresh()}};
+
+$('#dCsv').onclick=()=>{
+  const d=dataset();
+  let t=['Label'].concat(d.series.map(s=>s.name+' ('+d.u+')')).join(',')+'\n';
+  d.labels.forEach((l,i)=>t+=[l].concat(d.series.map(s=>s.values[i])).join(',')+'\n');
+  save(new Blob([t],{type:'text/csv'}),CO[st.co].n.replace(/\s/g,'_')+'_'+st.ds+'.csv');
+};
+
+$('#dPng').onclick=()=>{
+  if(st.ty==='table'){toast('Pick a chart format to download an image.');return}
+  const svg=$('#chart svg'),s=new XMLSerializer().serializeToString(svg),img=new Image();
+  img.onload=()=>{
+    const c=document.createElement('canvas');c.width=1440;c.height=720;
+    const x=c.getContext('2d');
+    x.fillStyle='#050505';x.fillRect(0,0,1440,720);x.drawImage(img,0,0,1440,720);
+    c.toBlob(b=>save(b,CO[st.co].n.replace(/\s/g,'_')+'_'+st.ds+'_'+st.ty+'.png'));
+  };
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" '));
+};
+
+/* ---------- account status ---------- */
+const store={
+  get users(){try{return JSON.parse(localStorage.getItem('fs_users')||'[]')}catch(e){return[]}},
+  get session(){try{return localStorage.getItem('fs_session')}catch(e){return null}},
+  set session(v){try{v?localStorage.setItem('fs_session',v):localStorage.removeItem('fs_session')}catch(e){}}
+};
+
+function renderAuth(){
+  const s=$('#authSlot'),u=store.users.find(x=>x.email===store.session);
+  if(u){
+    s.innerHTML='<span class="chip"></span><button class="btn btn-g btn-s" id="out">Log out</button>';
+    s.firstElementChild.textContent=u.name.split(' ')[0]+' | '+u.plan;
+    $('#out').onclick=()=>{store.session=null;renderAuth();toast('You are logged out.')};
+  }else{
+    s.innerHTML='<a class="btn btn-g btn-s" href="auth.html?mode=login">Log in</a><a class="btn btn-a btn-s" href="auth.html?mode=signup">Sign up</a>';
+  }
+}
+
+$('#togPlans').onclick=e=>{
+  const o=$('#plans').classList.toggle('open');
+  e.target.setAttribute('aria-expanded',o);
+  e.target.textContent=o?'Hide plans':'Compare plans';
+};
+
+(function(){
+  const q=new URLSearchParams(location.search).get('welcome');
+  if(!q)return;
+  const u=store.users.find(x=>x.email===store.session);
+  if(u)setTimeout(()=>toast(q==='new'?`Welcome, ${u.name.split(' ')[0]}. Your ${u.plan} membership is active.`:`Logged in as ${u.name}.`),400);
+  history.replaceState(null,'',location.pathname+location.hash);
+})();
+
+/* ---------- full-screen intro on entry ---------- */
+const Intro=(function(){
+  const ov=$('#iov'),v=$('#iVid'),root=document.documentElement;
+  const IC={
+    play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l14 8-14 8z"/></svg>',
+    pause:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+    on:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg>',
+    off:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4z" fill="currentColor"/><path d="M23 9l-6 6M17 9l6 6"/></svg>'
+  };
+  const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+  let idleT,lastFocus=null;
+  const seen=()=>{try{sessionStorage.setItem('fs_intro_seen','1')}catch(e){}};
+  const ui=()=>{
+    $('#iPlay').innerHTML=v.paused?IC.play:IC.pause;
+    $('#iPlay').setAttribute('aria-label',v.paused?'Play':'Pause');
+    $('#iMute').innerHTML=v.muted?IC.off:IC.on;
+    $('#iMute').setAttribute('aria-label',v.muted?'Unmute':'Mute');
+    ov.classList.toggle('paused',v.paused);
+    if(!v.muted)$('#iSound').classList.remove('show');
+  };
+  const wake=()=>{
+    ov.classList.remove('idle');clearTimeout(idleT);
+    if(!v.paused)idleT=setTimeout(()=>ov.classList.add('idle'),2600);
+  };
+  function cc(on){
+    try{v.textTracks[0].mode=on?'showing':'hidden'}catch(e){}
+    $('#iCC').classList.toggle('on',on);
+    $('#iCC').setAttribute('aria-pressed',on);
+  }
+  async function start(){
+    v.muted=false;
+    try{await v.play()}
+    catch(e){v.muted=true;try{await v.play();$('#iSound').classList.add('show')}catch(e2){}}
+    ui();wake();
+  }
+  function open(fromStart=true){
+    lastFocus=document.activeElement;
+    const inPage=$('#introVid');if(inPage&&!inPage.paused)inPage.pause();
+    ov.classList.remove('closing');ov.classList.add('open');root.classList.add('intro-on');
+    if(fromStart)v.currentTime=0;
+    cc($('#iCC').classList.contains('on'));
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches){v.pause();ui()}else start();
+    $('#iSkip').focus({preventScroll:true});
+  }
+  function close(){
+    seen();v.pause();ov.classList.add('closing');
+    setTimeout(()=>{
+      ov.classList.remove('open','closing','idle');root.classList.remove('intro-on');
+      if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
+    },600);
+  }
+  $('#iSkip').onclick=close;
+  $('#iBig').onclick=()=>{v.play();ui();wake()};
+  $('#iPlay').onclick=()=>{v.paused?v.play():v.pause();ui();wake()};
+  $('#iMute').onclick=()=>{v.muted=!v.muted;ui();wake()};
+  $('#iSound').onclick=()=>{v.muted=false;if(v.paused)v.play();ui();wake()};
+  $('#iCC').onclick=()=>{cc(!$('#iCC').classList.contains('on'));wake()};
+  v.addEventListener('click',()=>{
+    if(v.muted&&$('#iSound').classList.contains('show'))v.muted=false;
+    else v.paused?v.play():v.pause();
+    ui();wake();
+  });
+  v.addEventListener('play',ui);
+  v.addEventListener('pause',()=>{ui();wake()});
+  v.addEventListener('timeupdate',()=>{
+    const d=v.duration||110.5;
+    $('#iProg i').style.width=(v.currentTime/d*100)+'%';
+    $('#iTime').textContent=fmt(v.currentTime)+' / '+fmt(d);
+  });
+  v.addEventListener('ended',close);
+  const bad=()=>{
+    if(ov.classList.contains('open')||root.classList.contains('intro-on')){
+      seen();ov.classList.remove('open');root.classList.remove('intro-on');
+    }
+  };
+  const badIf=e=>{if(e.target===v||e.target.tagName==='SOURCE')bad()};
+  v.addEventListener('error',badIf);
+  v.querySelector('source').addEventListener('error',badIf);
+  const seek=x=>{
+    const r=$('#iProg').getBoundingClientRect();
+    v.currentTime=C01((x-r.left)/r.width)*(v.duration||110.5);wake();
+  };
+  const C01=n=>Math.min(1,Math.max(0,n));
+  $('#iProg').addEventListener('click',e=>seek(e.clientX));
+  $('#iProg').addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight')v.currentTime+=5;
+    if(e.key==='ArrowLeft')v.currentTime-=5;
+  });
+  ov.addEventListener('mousemove',wake);
+  ov.addEventListener('touchstart',wake,{passive:true});
+  document.addEventListener('keydown',e=>{
+    if(!ov.classList.contains('open'))return;
+    if(e.key==='Escape'){e.preventDefault();close()}
+    else if(e.key===' '&&e.target.tagName!=='BUTTON'){
+      e.preventDefault();v.paused?v.play():v.pause();ui();wake();
+    }else if(e.key==='Tab'){
+      const f=[...ov.querySelectorAll('button,[tabindex="0"]')].filter(x=>x.offsetParent);
+      const i=f.indexOf(document.activeElement);
+      if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}
+      else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus()}
+    }
+  });
+  if(root.classList.contains('intro-on'))open(true);
+  $('#hdrIntro').onclick=()=>open(true);
+  return{open};
+})();
+
+/* ---------- intro video ---------- */
+(function(){
+  const v=$('#introVid'),box=v.closest('.vbox');
+  const CH=[
+    ['Intro',0],['The problem: ~30% waste',7.6],
+    ['Meet the agent: six steps',16.2],['Tour: hero and pitch',24.4],
+    ['Tour: problem and estimator',30.4],['Tour: the solution',41.4],
+    ['Tour: live demo',46.9],['Tour: technical approach',64.9],
+    ['Tour: safety layers',75.9],['Tour: results and comparison',81.9],
+    ['Tour: business and roadmap',91.3],['Tour: impact and plans',96.5],
+    ['Outro',102.5]
+  ];
+  const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+  $('#chaps').innerHTML=CH.map(([n,s],i)=>
+    `<li><button data-s="${s}" data-i="${i}"><time>${fmt(s)}</time>${n}</button></li>`
+  ).join('');
+  const play=s=>{if(s!=null)v.currentTime=s;const p=v.play();if(p&&p.catch)p.catch(()=>{})};
+  $('#chaps').onclick=e=>{const b=e.target.closest('button');if(b)play(+b.dataset.s)};
+  $('#vplay').onclick=()=>play();
+  $('#watchBtn').addEventListener('click',e=>{e.preventDefault();Intro.open(true)});
+  v.addEventListener('play',()=>box.classList.add('playing'));
+  v.addEventListener('timeupdate',()=>{
+    let k=0;CH.forEach(([,s],i)=>{if(v.currentTime>=s)k=i});
+    $$('#chaps button').forEach((b,i)=>b.classList.toggle('on',i===k));
+  });
+  const miss=()=>{$('#vmiss').classList.remove('hide');$('#vplay').classList.add('hide')};
+  v.addEventListener('error',e=>{if(e.target===v)miss()});
+  v.querySelector('source').addEventListener('error',miss);
+})();
+
+renderAuth();
+calc();
+refresh();
+</script>
+</body>
+</html>
